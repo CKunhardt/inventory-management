@@ -26,3 +26,12 @@ export function convertAmount(amount, currency = 'USD') {
   }
   return amount
 }
+
+export function formatCompactCurrency(amount, currency = 'USD') {
+  const value = convertAmount(amount, currency)
+  const symbol = currency === 'JPY' ? '¥' : '$'
+  const abs = Math.abs(value)
+  if (abs >= 1_000_000) return `${symbol}${(value / 1_000_000).toFixed(abs >= 10_000_000 ? 0 : 1)}M`
+  if (abs >= 1_000) return `${symbol}${Math.round(value / 1000)}K`
+  return `${symbol}${Math.round(value)}`
+}
