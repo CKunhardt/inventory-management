@@ -180,7 +180,7 @@
                   <th>{{ t('dashboard.inventoryShortages.shortage') }}</th>
                   <th>{{ t('dashboard.inventoryShortages.daysDelayed') }}</th>
                   <th>{{ t('dashboard.inventoryShortages.priority') }}</th>
-                  <th>Actions</th>
+                  <th>{{ t('dashboard.inventoryShortages.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -214,14 +214,14 @@
                       @click.stop="openPOModal(item)"
                       class="po-button create"
                     >
-                      Create PO
+                      {{ t('dashboard.inventoryShortages.createPO') }}
                     </button>
                     <button
                       v-else
                       @click.stop="viewPO(item)"
                       class="po-button view"
                     >
-                      View PO
+                      {{ t('dashboard.inventoryShortages.viewPO') }}
                     </button>
                   </td>
                 </tr>
@@ -284,14 +284,6 @@
       :is-open="showBacklogModal"
       :backlog-item="selectedBacklogItem"
       @close="showBacklogModal = false"
-    />
-
-    <PurchaseOrderModal
-      :is-open="showPOModal"
-      :backlog-item="selectedBacklogForPO"
-      :mode="poModalMode"
-      @close="showPOModal = false"
-      @po-created="handlePOCreated"
     />
   </div>
 </template>
@@ -561,6 +553,7 @@ export default {
     const loadData = async () => {
       try {
         loading.value = true
+        error.value = null
         const filters = getCurrentFilters()
 
         const [summaryData, ordersData, inventoryData, backlogData] = await Promise.all([
@@ -591,8 +584,12 @@ export default {
              statusData.value.processing + statusData.value.backordered
     })
 
+    // Donut chart circles use r="65" (see template); circumference = 2 * PI * r
+    const DONUT_CIRCLE_RADIUS = 65
+    const DONUT_CIRCLE_CIRCUMFERENCE = 2 * Math.PI * DONUT_CIRCLE_RADIUS
+
     const getCircleSegment = (value) => {
-      return totalOrders.value > 0 ? (value / totalOrders.value) * 440 : 0
+      return totalOrders.value > 0 ? (value / totalOrders.value) * DONUT_CIRCLE_CIRCUMFERENCE : 0
     }
 
     const getStockBadge = (level) => {
@@ -662,16 +659,6 @@ export default {
       showPOModal.value = true
     }
 
-    const handlePOCreated = (poData) => {
-      // Update the backlog item with the new PO ID
-      const item = allBacklogItems.value.find(b => b.id === poData.backlog_item_id)
-      if (item) {
-        item.purchase_order_id = poData.id
-        item.purchase_order = poData
-      }
-      showPOModal.value = false
-    }
-
     // Watch for filter changes and reload data
     watch([selectedPeriod, selectedLocation, selectedCategory, selectedStatus], () => {
       loadData()
@@ -719,8 +706,7 @@ export default {
       selectedBacklogForPO,
       poModalMode,
       openPOModal,
-      viewPO,
-      handlePOCreated
+      viewPO
     }
   }
 }

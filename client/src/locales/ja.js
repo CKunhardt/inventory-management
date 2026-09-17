@@ -7,6 +7,7 @@ export default {
     finance: '財務',
     demandForecast: '需要予測',
     restocking: '補充',
+    reports: 'レポート',
     companyName: '触媒コンポーネンツ',
     subtitle: '在庫管理システム'
   },
@@ -56,7 +57,10 @@ export default {
       daysDelayed: '遅延日数',
       priority: '優先度',
       unitsShort: '単位不足',
-      days: '日'
+      days: '日',
+      actions: 'アクション',
+      createPO: 'PO作成',
+      viewPO: 'PO表示'
     },
     topProducts: {
       title: '収益別トップ製品',
@@ -240,6 +244,60 @@ export default {
     itemsCount: '{count}件'
   },
 
+  // Backlog
+  backlog: {
+    title: 'バックログ管理',
+    description: '在庫不足の追跡と解消',
+    highPriority: '高優先度',
+    mediumPriority: '中優先度',
+    lowPriority: '低優先度',
+    totalItems: 'バックログ品目総数',
+    items: 'バックログ品目',
+    noItems: 'バックログ品目なし - すべての注文を履行できます！',
+    unitsShort: '{count}単位不足',
+    table: {
+      orderId: '注文ID',
+      sku: 'SKU',
+      itemName: '品目名',
+      quantityNeeded: '必要数量',
+      quantityAvailable: '在庫数量',
+      shortage: '不足',
+      daysDelayed: '遅延日数',
+      priority: '優先度'
+    }
+  },
+
+  // Reports
+  reports: {
+    title: 'パフォーマンスレポート',
+    description: '四半期の業績指標と月次トレンドを表示',
+    quarterlyPerformance: '四半期業績',
+    monthlyRevenueTrend: '月次収益トレンド',
+    monthOverMonth: '前月比分析',
+    quarterFormat: '{year}年 第{number}四半期',
+    monthFormat: '{year}年{month}',
+    notAvailable: '該当なし',
+    loadError: 'レポートの読み込みに失敗しました',
+    table: {
+      quarter: '四半期',
+      totalOrders: '総注文数',
+      totalRevenue: '総収益',
+      avgOrderValue: '平均注文額',
+      fulfillmentRate: '受注充足率',
+      month: '月',
+      orders: '注文数',
+      revenue: '収益',
+      change: '増減額',
+      growthRate: '成長率'
+    },
+    stats: {
+      totalRevenue: '年初来総収益',
+      avgMonthlyRevenue: '月平均収益',
+      totalOrders: '年初来総注文数',
+      bestQuarter: '最高業績四半期'
+    }
+  },
+
   // Filters
   filters: {
     timePeriod: '期間',
@@ -247,7 +305,8 @@ export default {
     category: 'カテゴリ',
     orderStatus: '注文ステータス',
     all: 'すべて',
-    allMonths: 'すべての月'
+    allMonths: 'すべての月',
+    reset: 'すべてのフィルターをリセット'
   },
 
   // Statuses
@@ -258,7 +317,8 @@ export default {
     backordered: 'バックオーダー',
     inStock: '在庫あり',
     lowStock: '在庫僅少',
-    adequate: '適量'
+    adequate: '適量',
+    outOfStock: '在庫切れ'
   },
 
   // Trends
@@ -353,7 +413,57 @@ export default {
     priority: '優先度',
     dueDate: '期限',
     addTask: 'タスクを追加',
-    noTasks: 'タスクがありません。上記からタスクを追加してください！'
+    noTasks: 'タスクがありません。上記からタスクを追加してください！',
+    deleteTask: 'タスクを削除'
+  },
+
+  // Backlog Detail Modal
+  backlogDetail: {
+    title: '在庫不足の詳細',
+    priorityLabel: '優先度：{priority}',
+    shortageAmount: '不足数量',
+    daysDelayed: '遅延日数',
+    orderId: '注文ID',
+    itemSku: '品目SKU',
+    quantityNeeded: '必要数量',
+    quantityAvailable: '在庫数量',
+    expectedDate: '予定日',
+    status: 'ステータス'
+  },
+
+  // Inventory Detail Modal
+  inventoryDetail: {
+    title: '在庫品目の詳細',
+    quantityOnHand: '手持在庫数',
+    stockLevel: '在庫レベル',
+    vsReorderPoint: '再注文点との比較',
+    category: 'カテゴリ',
+    location: '場所',
+    reorderPoint: '再注文点',
+    unitsRemaining: '残数量',
+    unitCost: '単価',
+    totalValue: '総価値',
+    warehouse: '倉庫',
+    status: 'ステータス'
+  },
+
+  // Product Detail Modal
+  productDetail: {
+    title: '製品詳細',
+    category: 'カテゴリ',
+    warehouse: '倉庫',
+    unitsOrdered: '注文数量',
+    totalRevenue: '総収益',
+    currentStock: '現在庫',
+    reorderPoint: '再注文点',
+    firstOrderDate: '初回注文日',
+    stockStatus: '在庫状況'
+  },
+
+  // Cost Detail Modal
+  costDetail: {
+    title: '{month}のコスト内訳',
+    totalCosts: '総コスト'
   },
 
   // Language
@@ -375,7 +485,10 @@ export default {
     search: '検索',
     filter: 'フィルター',
     export: 'エクスポート',
-    items: '件'
+    items: '件',
+    skuLabel: 'SKU:',
+    unitsCount: '{count}個',
+    daysCount: '{count}日'
   },
 
   // Product Names

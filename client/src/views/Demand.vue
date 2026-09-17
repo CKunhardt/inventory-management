@@ -142,6 +142,7 @@ export default {
     const loadForecasts = async () => {
       try {
         loading.value = true
+        error.value = null
         const filters = getCurrentFilters()
 
         const [forecastsData, inventoryData] = await Promise.all([

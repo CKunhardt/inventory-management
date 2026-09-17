@@ -42,5 +42,9 @@ purchase_orders = load_json_file('purchase_orders.json')
 # written back, so it resets whenever the server restarts.
 restock_orders = load_json_file('restock_orders.json')
 
+# Tasks created through POST /api/tasks. Mutated at runtime in the same way as
+# restock_orders above, and seeded from an empty JSON file.
+tasks = load_json_file('tasks.json')
+
 # All data is now loaded from JSON files in the data/ directory
 # This allows for easier maintenance and updates of the sample data

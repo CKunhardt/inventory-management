@@ -7,6 +7,7 @@ export default {
     finance: 'Finance',
     demandForecast: 'Demand Forecast',
     restocking: 'Restocking',
+    reports: 'Reports',
     companyName: 'Catalyst Components',
     subtitle: 'Inventory Management System'
   },
@@ -56,7 +57,10 @@ export default {
       daysDelayed: 'Days Delayed',
       priority: 'Priority',
       unitsShort: 'units short',
-      days: 'days'
+      days: 'days',
+      actions: 'Actions',
+      createPO: 'Create PO',
+      viewPO: 'View PO'
     },
     topProducts: {
       title: 'Top Products by Revenue',
@@ -240,6 +244,60 @@ export default {
     itemsCount: '{count} items'
   },
 
+  // Backlog
+  backlog: {
+    title: 'Backlog Management',
+    description: 'Track and resolve inventory shortages',
+    highPriority: 'High Priority',
+    mediumPriority: 'Medium Priority',
+    lowPriority: 'Low Priority',
+    totalItems: 'Total Backlog Items',
+    items: 'Backlog Items',
+    noItems: 'No backlog items - all orders can be fulfilled!',
+    unitsShort: '{count} units short',
+    table: {
+      orderId: 'Order ID',
+      sku: 'SKU',
+      itemName: 'Item Name',
+      quantityNeeded: 'Quantity Needed',
+      quantityAvailable: 'Quantity Available',
+      shortage: 'Shortage',
+      daysDelayed: 'Days Delayed',
+      priority: 'Priority'
+    }
+  },
+
+  // Reports
+  reports: {
+    title: 'Performance Reports',
+    description: 'View quarterly performance metrics and monthly trends',
+    quarterlyPerformance: 'Quarterly Performance',
+    monthlyRevenueTrend: 'Monthly Revenue Trend',
+    monthOverMonth: 'Month-over-Month Analysis',
+    quarterFormat: 'Q{number}-{year}',
+    monthFormat: '{month} {year}',
+    notAvailable: 'N/A',
+    loadError: 'Failed to load reports',
+    table: {
+      quarter: 'Quarter',
+      totalOrders: 'Total Orders',
+      totalRevenue: 'Total Revenue',
+      avgOrderValue: 'Avg Order Value',
+      fulfillmentRate: 'Fulfillment Rate',
+      month: 'Month',
+      orders: 'Orders',
+      revenue: 'Revenue',
+      change: 'Change',
+      growthRate: 'Growth Rate'
+    },
+    stats: {
+      totalRevenue: 'Total Revenue (YTD)',
+      avgMonthlyRevenue: 'Avg Monthly Revenue',
+      totalOrders: 'Total Orders (YTD)',
+      bestQuarter: 'Best Performing Quarter'
+    }
+  },
+
   // Filters
   filters: {
     timePeriod: 'Time Period',
@@ -247,7 +305,8 @@ export default {
     category: 'Category',
     orderStatus: 'Order Status',
     all: 'All',
-    allMonths: 'All Months'
+    allMonths: 'All Months',
+    reset: 'Reset all filters'
   },
 
   // Statuses
@@ -258,7 +317,8 @@ export default {
     backordered: 'Backordered',
     inStock: 'In Stock',
     lowStock: 'Low Stock',
-    adequate: 'Adequate'
+    adequate: 'Adequate',
+    outOfStock: 'Out of Stock'
   },
 
   // Trends
@@ -353,7 +413,57 @@ export default {
     priority: 'Priority',
     dueDate: 'Due Date',
     addTask: 'Add Task',
-    noTasks: 'No tasks yet. Add your first task above!'
+    noTasks: 'No tasks yet. Add your first task above!',
+    deleteTask: 'Delete task'
+  },
+
+  // Backlog Detail Modal
+  backlogDetail: {
+    title: 'Inventory Shortage Details',
+    priorityLabel: '{priority} Priority',
+    shortageAmount: 'Shortage Amount',
+    daysDelayed: 'Days Delayed',
+    orderId: 'Order ID',
+    itemSku: 'Item SKU',
+    quantityNeeded: 'Quantity Needed',
+    quantityAvailable: 'Quantity Available',
+    expectedDate: 'Expected Date',
+    status: 'Status'
+  },
+
+  // Inventory Detail Modal
+  inventoryDetail: {
+    title: 'Inventory Item Details',
+    quantityOnHand: 'Quantity on Hand',
+    stockLevel: 'Stock Level',
+    vsReorderPoint: 'vs. reorder point',
+    category: 'Category',
+    location: 'Location',
+    reorderPoint: 'Reorder Point',
+    unitsRemaining: 'Units Remaining',
+    unitCost: 'Unit Cost',
+    totalValue: 'Total Value',
+    warehouse: 'Warehouse',
+    status: 'Status'
+  },
+
+  // Product Detail Modal
+  productDetail: {
+    title: 'Product Details',
+    category: 'Category',
+    warehouse: 'Warehouse',
+    unitsOrdered: 'Units Ordered',
+    totalRevenue: 'Total Revenue',
+    currentStock: 'Current Stock',
+    reorderPoint: 'Reorder Point',
+    firstOrderDate: 'First Order Date',
+    stockStatus: 'Stock Status'
+  },
+
+  // Cost Detail Modal
+  costDetail: {
+    title: '{month} Cost Breakdown',
+    totalCosts: 'Total Costs'
   },
 
   // Language
@@ -375,6 +485,9 @@ export default {
     search: 'Search',
     filter: 'Filter',
     export: 'Export',
-    items: 'items'
+    items: 'items',
+    skuLabel: 'SKU:',
+    unitsCount: '{count} units',
+    daysCount: '{count} days'
   }
 }

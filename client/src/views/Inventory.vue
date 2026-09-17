@@ -73,8 +73,8 @@
                 <td>{{ translateCategory(item.category) }}</td>
                 <td><strong>{{ item.quantity_on_hand }}</strong></td>
                 <td>{{ item.reorder_point }}</td>
-                <td>{{ currencySymbol }}{{ item.unit_cost.toFixed(2) }}</td>
-                <td><strong>{{ currencySymbol }}{{ (item.quantity_on_hand * item.unit_cost).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</strong></td>
+                <td>{{ formatCurrencyWithDecimals(item.unit_cost) }}</td>
+                <td><strong>{{ formatCurrencyWithDecimals(item.quantity_on_hand * item.unit_cost) }}</strong></td>
                 <td>{{ translateWarehouse(item.location) }}</td>
                 <td>
                   <span :class="['badge', getStockStatusClass(item)]">
@@ -101,6 +101,7 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { api } from '../api'
 import { useFilters } from '../composables/useFilters'
 import { useI18n } from '../composables/useI18n'
+import { formatCurrencyWithDecimals as formatCurrencyWithDecimalsUtil } from '../utils/currency'
 import InventoryDetailModal from '../components/InventoryDetailModal.vue'
 import { toCsv, downloadCsv, isoDateStamp } from '../utils/csv'
 
@@ -112,9 +113,7 @@ export default {
   setup() {
     const { t, currentCurrency, translateProductName, translateWarehouse } = useI18n()
 
-    const currencySymbol = computed(() => {
-      return currentCurrency.value === 'JPY' ? '¥' : '$'
-    })
+    const formatCurrencyWithDecimals = (value) => formatCurrencyWithDecimalsUtil(value, currentCurrency.value, 2)
 
     const loading = ref(true)
     const error = ref(null)
@@ -166,6 +165,7 @@ export default {
     const loadInventory = async () => {
       try {
         loading.value = true
+        error.value = null
         const filters = getCurrentFilters()
         // Inventory doesn't support month/status filters, only warehouse and category
         items.value = await api.getInventory({
@@ -218,12 +218,11 @@ export default {
     // Exports exactly what's on screen: filteredItems already has the global
     // warehouse/category filters and the search box applied.
     //
-    // Currency: the on-screen table renders `currencySymbol + unit_cost.toFixed(2)`,
-    // which has a known bug where the yen symbol gets slapped on unconverted USD
-    // figures. Rather than inherit that bug, the export skips currencySymbol
-    // entirely and writes raw USD numbers, naming the currency in the header
-    // instead. Do not reintroduce currencySymbol here without fixing the
-    // underlying conversion bug first.
+    // Currency: the export deliberately writes raw USD numbers and names the
+    // currency in the header, so the file means the same thing whatever locale
+    // it was exported from. The on-screen table converts via utils/currency.js
+    // and is locale-dependent; do not make the export follow it without
+    // deciding what a yen-denominated export should contain.
     const exportCsv = () => {
       const headers = [
         t('inventory.table.sku'),
@@ -269,7 +268,7 @@ export default {
       showItemModal,
       selectedItem,
       showItemDetail,
-      currencySymbol,
+      formatCurrencyWithDecimals,
       translateProductName,
       translateWarehouse,
       exportCsv
