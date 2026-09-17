@@ -12,6 +12,20 @@ server_path = Path(__file__).parent.parent.parent / "server"
 sys.path.insert(0, str(server_path))
 
 from main import app
+import mock_data
+
+
+@pytest.fixture
+def reset_restock_orders():
+    """Snapshot and restore the restock_orders list around a test.
+
+    POST /api/restock-orders appends to a module-level list that is shared by
+    every test in the session, so without this a submitting test leaks its
+    orders into the next one and counts drift as the suite grows.
+    """
+    snapshot = list(mock_data.restock_orders)
+    yield
+    mock_data.restock_orders[:] = snapshot
 
 
 @pytest.fixture
