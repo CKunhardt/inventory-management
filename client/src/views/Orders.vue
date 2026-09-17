@@ -60,7 +60,7 @@
                     {{ t(`status.${order.status.toLowerCase()}`) }}
                   </span>
                 </td>
-                <td class="col-value">{{ currencySymbol }}{{ Math.round(order.total_value).toLocaleString() }}</td>
+                <td class="col-value">{{ formatCurrency(order.total_value) }}</td>
               </tr>
             </tbody>
           </table>

@@ -218,12 +218,11 @@ export default {
     // Exports exactly what's on screen: filteredItems already has the global
     // warehouse/category filters and the search box applied.
     //
-    // Currency: the on-screen table renders `currencySymbol + unit_cost.toFixed(2)`,
-    // which has a known bug where the yen symbol gets slapped on unconverted USD
-    // figures. Rather than inherit that bug, the export skips currencySymbol
-    // entirely and writes raw USD numbers, naming the currency in the header
-    // instead. Do not reintroduce currencySymbol here without fixing the
-    // underlying conversion bug first.
+    // Currency: the export deliberately writes raw USD numbers and names the
+    // currency in the header, so the file means the same thing whatever locale
+    // it was exported from. The on-screen table converts via utils/currency.js
+    // and is locale-dependent; do not make the export follow it without
+    // deciding what a yen-denominated export should contain.
     const exportCsv = () => {
       const headers = [
         t('inventory.table.sku'),
