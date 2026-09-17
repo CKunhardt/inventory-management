@@ -11,25 +11,38 @@
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">{{ t('inventory.stockLevels') }} ({{ filteredItems.length }} {{ t('inventory.skus') }})</h3>
-          <div class="search-box">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-            </svg>
-            <input
-              v-model="searchQuery"
-              type="text"
-              :placeholder="t('inventory.searchPlaceholder')"
-              class="search-input"
-            />
+          <div class="header-controls">
+            <div class="search-box">
+              <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+              </svg>
+              <input
+                v-model="searchQuery"
+                type="text"
+                :placeholder="t('inventory.searchPlaceholder')"
+                class="search-input"
+              />
+              <button
+                v-if="searchQuery"
+                @click="searchQuery = ''"
+                class="clear-search"
+                :title="t('inventory.clearSearch')"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
             <button
-              v-if="searchQuery"
-              @click="searchQuery = ''"
-              class="clear-search"
-              :title="t('inventory.clearSearch')"
+              class="export-csv-btn"
+              :disabled="filteredItems.length === 0"
+              @click="exportCsv"
+              :title="t('inventory.exportCsv')"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v7.586l2.293-2.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 11.586V4a1 1 0 011-1zM4 15a1 1 0 011 1v1a1 1 0 001 1h8a1 1 0 001-1v-1a1 1 0 112 0v1a3 3 0 01-3 3H6a3 3 0 01-3-3v-1a1 1 0 011-1z" clip-rule="evenodd" />
               </svg>
+              {{ t('inventory.exportCsv') }}
             </button>
           </div>
         </div>
@@ -89,6 +102,7 @@ import { api } from '../api'
 import { useFilters } from '../composables/useFilters'
 import { useI18n } from '../composables/useI18n'
 import InventoryDetailModal from '../components/InventoryDetailModal.vue'
+import { toCsv, downloadCsv, isoDateStamp } from '../utils/csv'
 
 export default {
   name: 'Inventory',
@@ -201,6 +215,45 @@ export default {
       showItemModal.value = true
     }
 
+    // Exports exactly what's on screen: filteredItems already has the global
+    // warehouse/category filters and the search box applied.
+    //
+    // Currency: the on-screen table renders `currencySymbol + unit_cost.toFixed(2)`,
+    // which has a known bug where the yen symbol gets slapped on unconverted USD
+    // figures. Rather than inherit that bug, the export skips currencySymbol
+    // entirely and writes raw USD numbers, naming the currency in the header
+    // instead. Do not reintroduce currencySymbol here without fixing the
+    // underlying conversion bug first.
+    const exportCsv = () => {
+      const headers = [
+        t('inventory.table.sku'),
+        t('inventory.table.itemName'),
+        t('inventory.table.category'),
+        t('inventory.table.quantityOnHand'),
+        t('inventory.table.reorderPoint'),
+        `${t('inventory.table.unitCost')} (USD)`,
+        `${t('inventory.table.totalValue')} (USD)`,
+        t('inventory.table.location'),
+        t('inventory.table.status')
+      ]
+
+      const rows = filteredItems.value.map(item => [
+        item.sku,
+        translateProductName(item.name),
+        translateCategory(item.category),
+        item.quantity_on_hand,
+        item.reorder_point,
+        item.unit_cost,
+        // Round to 2dp so floating point multiplication doesn't serialize as
+        // e.g. 1234.5600000000001.
+        Math.round(item.quantity_on_hand * item.unit_cost * 100) / 100,
+        translateWarehouse(item.location),
+        getStockStatus(item)
+      ])
+
+      downloadCsv(`inventory-${isoDateStamp()}.csv`, toCsv(headers, rows))
+    }
+
     onMounted(loadInventory)
 
     return {
@@ -218,7 +271,8 @@ export default {
       showItemDetail,
       currencySymbol,
       translateProductName,
-      translateWarehouse
+      translateWarehouse,
+      exportCsv
     }
   }
 }
@@ -252,6 +306,12 @@ export default {
   font-weight: 600;
   color: #0f172a;
   margin: 0;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .search-box {
@@ -315,6 +375,40 @@ export default {
 .clear-search svg {
   width: 18px;
   height: 18px;
+}
+
+.export-csv-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  color: #0f172a;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.export-csv-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.export-csv-btn:hover:not(:disabled) {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.export-csv-btn:disabled {
+  color: #94a3b8;
+  border-color: #e2e8f0;
+  background: #f8fafc;
+  cursor: not-allowed;
 }
 
 .loading,
