@@ -152,6 +152,25 @@ def get_item(item_id: str):
 - Use same date format everywhere
 - Validate JSON structure before committing
 
+**Exception: `restock_orders` is mutable at runtime**
+
+Every other dataset here is read-only after load, and the Common Pitfalls
+section below is right to warn against mutating global data. `restock_orders`
+is the deliberate exception. `POST /api/restock-orders` appends to it, which is
+what lets a submitted order be read back by a later request and seen from
+another browser tab. Without that, "submit an order" would have nowhere to
+land, since the API has no persistence layer.
+
+The consequences are intentional and worth knowing:
+
+- Submitted orders are lost on restart. The seed file `data/restock_orders.json`
+  stays an empty array and is never written to.
+- Tests that POST leak state into each other. `tests/backend/conftest.py`
+  provides a `reset_restock_orders` fixture that snapshots and restores the
+  list around each test; use it on any test that submits an order.
+
+Do not extend this pattern to the other datasets without a similar note here.
+
 ### CORS Configuration
 
 **Development:**

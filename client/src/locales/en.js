@@ -6,6 +6,7 @@ export default {
     orders: 'Orders',
     finance: 'Finance',
     demandForecast: 'Demand Forecast',
+    restocking: 'Restocking',
     companyName: 'Catalyst Components',
     subtitle: 'Inventory Management System'
   },
@@ -80,6 +81,7 @@ export default {
     skus: 'SKUs',
     searchPlaceholder: 'Search by item name...',
     clearSearch: 'Clear search',
+    exportCsv: 'Export CSV',
     totalItems: 'Total Items',
     totalValue: 'Total Value',
     lowStockItems: 'Low Stock Items',
@@ -186,6 +188,56 @@ export default {
       trend: 'Trend',
       period: 'Period'
     }
+  },
+
+  // Restocking
+  restocking: {
+    title: 'Restocking',
+    description: 'Set a budget and order the items your forecast says you will run short of',
+    budget: 'Available budget',
+    budgetHelp: 'Drag to set what you have to spend',
+    recommended: 'Recommended basket',
+    recommendedHelp: 'Most urgent shortfalls first, within budget. Adjust anything before ordering.',
+    allocated: 'Allocated',
+    remaining: 'Remaining',
+    overBudget: 'Over budget by {amount}',
+    itemsSelected: '{count} of {total} items selected',
+    noCandidates: 'Nothing needs restocking for the current filters.',
+    noSelection: 'Select at least one item to place an order.',
+    placeOrder: 'Place Order',
+    placing: 'Placing order...',
+    orderPlaced: 'Order {orderNumber} submitted. Arriving in {days} days.',
+    orderFailed: 'Could not submit the order: {message}',
+    table: {
+      include: 'Include',
+      sku: 'SKU',
+      itemName: 'Item Name',
+      onHand: 'On Hand',
+      forecast: 'Forecast',
+      shortfall: 'Shortfall',
+      trend: 'Trend',
+      unitCost: 'Unit Cost',
+      quantity: 'Quantity',
+      lineTotal: 'Line Total'
+    }
+  },
+
+  // Submitted restocking orders, shown on the Orders tab
+  submittedOrders: {
+    title: 'Submitted Orders',
+    description: 'Restocking orders placed in this session',
+    empty: 'No restocking orders submitted yet.',
+    table: {
+      orderNumber: 'Order Number',
+      items: 'Items',
+      submitted: 'Submitted',
+      expectedDelivery: 'Expected Delivery',
+      leadTime: 'Lead Time',
+      status: 'Status',
+      totalValue: 'Total Value'
+    },
+    leadTimeDays: '{days} days',
+    itemsCount: '{count} items'
   },
 
   // Filters

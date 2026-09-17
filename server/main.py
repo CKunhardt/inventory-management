@@ -2,7 +2,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
 from pydantic import BaseModel
-from mock_data import inventory_items, orders, demand_forecasts, backlog_items, spending_summary, monthly_spending, category_spending, recent_transactions, purchase_orders
+from datetime import datetime, timedelta
+from statistics import median
+from mock_data import inventory_items, orders, demand_forecasts, backlog_items, spending_summary, monthly_spending, category_spending, recent_transactions, purchase_orders, restock_orders
 
 app = FastAPI(title="Factory Inventory Management System")
 
@@ -119,6 +121,62 @@ class CreatePurchaseOrderRequest(BaseModel):
     unit_cost: float
     expected_delivery_date: str
     notes: Optional[str] = None
+
+# Restocking orders are a basket of SKUs, so they need their own models rather
+# than PurchaseOrder, which is keyed to a single backlog_item_id and supplier.
+class RestockOrderLine(BaseModel):
+    sku: str
+    name: str
+    quantity: int
+    unit_cost: float
+    line_total: float
+
+class RestockOrder(BaseModel):
+    id: str
+    order_number: str
+    lines: List[RestockOrderLine]
+    total_value: float
+    budget: float
+    status: str
+    created_date: str
+    expected_delivery_date: str
+    lead_time_days: int
+    warehouse: Optional[str] = None
+    category: Optional[str] = None
+
+class CreateRestockOrderLine(BaseModel):
+    sku: str
+    quantity: int
+
+class CreateRestockOrderRequest(BaseModel):
+    lines: List[CreateRestockOrderLine]
+    budget: float
+    warehouse: Optional[str] = None
+    category: Optional[str] = None
+
+# Fallback used when a category has no delivered history to learn from.
+DEFAULT_LEAD_TIME_DAYS = 14
+
+def lead_time_days_for_category(category: Optional[str]) -> int:
+    """Median order-to-expected-delivery gap, in days, for a category.
+
+    Derived from the historical orders rather than hardcoded, so a restocking
+    order inherits the delivery expectation the rest of the dataset implies.
+    """
+    gaps = []
+    for order in orders:
+        if category and order.get("category") != category:
+            continue
+        try:
+            placed = datetime.fromisoformat(order["order_date"])
+            due = datetime.fromisoformat(order["expected_delivery"])
+        except (KeyError, ValueError):
+            continue
+        gaps.append((due - placed).days)
+
+    if not gaps:
+        return DEFAULT_LEAD_TIME_DAYS
+    return max(1, int(median(gaps)))
 
 # API endpoints
 @app.get("/")
@@ -303,6 +361,64 @@ def get_monthly_trends():
     result = list(months.values())
     result.sort(key=lambda x: x['month'])
     return result
+
+@app.get("/api/restock-orders", response_model=List[RestockOrder])
+def get_restock_orders():
+    """Get all restocking orders submitted during this server run"""
+    return restock_orders
+
+@app.post("/api/restock-orders", response_model=RestockOrder, status_code=201)
+def create_restock_order(request: CreateRestockOrderRequest):
+    """Submit a restocking order for a basket of inventory SKUs"""
+    if not request.lines:
+        raise HTTPException(status_code=400, detail="Order must contain at least one line")
+
+    lines = []
+    for requested in request.lines:
+        if requested.quantity <= 0:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Quantity for {requested.sku} must be greater than zero"
+            )
+
+        item = next((i for i in inventory_items if i["sku"] == requested.sku), None)
+        if not item:
+            raise HTTPException(status_code=404, detail=f"Inventory item {requested.sku} not found")
+
+        line_total = round(requested.quantity * item["unit_cost"], 2)
+        lines.append(RestockOrderLine(
+            sku=item["sku"],
+            name=item["name"],
+            quantity=requested.quantity,
+            unit_cost=item["unit_cost"],
+            line_total=line_total,
+        ))
+
+    total_value = round(sum(line.line_total for line in lines), 2)
+    created = datetime.now()
+    lead_time = lead_time_days_for_category(request.category)
+
+    order = RestockOrder(
+        id=str(len(restock_orders) + 1),
+        order_number=f"RST-{created.year}-{len(restock_orders) + 1:04d}",
+        lines=lines,
+        total_value=total_value,
+        budget=request.budget,
+        status="Processing",
+        created_date=created.isoformat(timespec="seconds"),
+        expected_delivery_date=(created + timedelta(days=lead_time)).isoformat(timespec="seconds"),
+        lead_time_days=lead_time,
+        warehouse=request.warehouse,
+        category=request.category,
+    )
+
+    # Deliberate exception to the "don't mutate global data" rule in CLAUDE.md:
+    # this is the one dataset the API owns rather than reads. Appending here is
+    # what makes a submitted order visible to later requests and to other
+    # browser tabs. It is never written to disk, so a restart clears it.
+    restock_orders.append(order.model_dump())
+    return order
+
 
 if __name__ == "__main__":
     import uvicorn
