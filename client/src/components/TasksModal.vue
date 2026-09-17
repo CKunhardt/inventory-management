@@ -85,7 +85,7 @@
                     />
                     <span class="task-title" @click="$emit('toggle-task', task.id)">{{ task.title }}</span>
                   </div>
-                  <button @click="$emit('delete-task', task.id)" class="task-delete-btn" title="Delete task">
+                  <button @click="$emit('delete-task', task.id)" class="task-delete-btn" :title="t('tasks.deleteTask')">
                     ×
                   </button>
                 </div>

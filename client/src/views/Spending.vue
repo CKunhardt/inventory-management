@@ -56,8 +56,8 @@
             <div class="chart-area">
               <div v-for="month in monthlyRevenue" :key="month.month" class="bar-group-revenue">
                 <div class="revenue-bars">
-                  <div class="revenue-bar" :style="{ height: getRevenueBarHeight(month.revenue) + '%' }" :title="`Revenue: ${formatCurrency(month.revenue)}`"></div>
-                  <div class="cost-bar" :style="{ height: getRevenueBarHeight(month.costs) + '%' }" :title="`Costs: ${formatCurrency(month.costs)}`"></div>
+                  <div class="revenue-bar" :style="{ height: getRevenueBarHeight(month.revenue) + '%' }" :title="`${t('finance.revenueVsCosts.revenue')}: ${formatCurrency(month.revenue)}`"></div>
+                  <div class="cost-bar" :style="{ height: getRevenueBarHeight(month.costs) + '%' }" :title="`${t('finance.revenueVsCosts.costs')}: ${formatCurrency(month.costs)}`"></div>
                 </div>
                 <span class="bar-label">{{ translateMonth(month.month) }}</span>
               </div>
@@ -90,10 +90,10 @@
             <div class="chart-area">
               <div v-for="month in monthlySpending" :key="month.month" class="bar-group">
                 <div class="stacked-bar" @click="showCostDetail(month)">
-                  <div class="bar-segment procurement" :style="{ height: getBarHeight(month.procurement) + '%' }" :title="`Procurement: ${formatCurrency(month.procurement)}`"></div>
-                  <div class="bar-segment operational" :style="{ height: getBarHeight(month.operational) + '%' }" :title="`Operational: ${formatCurrency(month.operational)}`"></div>
-                  <div class="bar-segment labor" :style="{ height: getBarHeight(month.labor) + '%' }" :title="`Labor: ${formatCurrency(month.labor)}`"></div>
-                  <div class="bar-segment overhead" :style="{ height: getBarHeight(month.overhead) + '%' }" :title="`Overhead: ${formatCurrency(month.overhead)}`"></div>
+                  <div class="bar-segment procurement" :style="{ height: getBarHeight(month.procurement) + '%' }" :title="`${t('finance.monthlyCostFlow.procurement')}: ${formatCurrency(month.procurement)}`"></div>
+                  <div class="bar-segment operational" :style="{ height: getBarHeight(month.operational) + '%' }" :title="`${t('finance.monthlyCostFlow.operational')}: ${formatCurrency(month.operational)}`"></div>
+                  <div class="bar-segment labor" :style="{ height: getBarHeight(month.labor) + '%' }" :title="`${t('finance.monthlyCostFlow.labor')}: ${formatCurrency(month.labor)}`"></div>
+                  <div class="bar-segment overhead" :style="{ height: getBarHeight(month.overhead) + '%' }" :title="`${t('finance.monthlyCostFlow.overhead')}: ${formatCurrency(month.overhead)}`"></div>
                 </div>
                 <span class="bar-label">{{ translateMonth(month.month) }}</span>
               </div>
